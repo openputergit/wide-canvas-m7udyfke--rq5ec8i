@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Titans</title>
+    <script src="https://unpkg.com/marked@4.0.0/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.24.1/prism.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .neubrutalism {
+            border: 3px solid #000;
+            box-shadow: 5px 5px 0px #000;
+        }
+        .chat-container {
+            height: calc(100vh - 180px);
+        }
+        .message-input {
+            background: white;
+            border: 3px solid #000;
+            transition: all 0.2s ease;
+        }
+        .send-button {
+            background-color: #000;
+            color: white;
+        }
+        .button-hover:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 7px 7px 0px #000;
+        }
+    </style>
+</head>
+<body class="bg-[#f0f0f0]">
+    <div class="container mx-auto p-4 max-w-4xl">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-6">
+            <button class="neubrutalism p-2 rounded-lg button-hover bg-white">
+                <i class="bi bi-list text-2xl"></i>
+            </button>
+            <div class="neubrutalism py-2 px-4 rounded-lg bg-black text-white">
+                <span class="font-bold">Tech Titans</span>
+            </div>
+            <button class="neubrutalism p-2 rounded-lg button-hover bg-white">
+                <i class="bi bi-three-dots-vertical text-2xl"></i>
+            </button>
+        </header>
+
+        <!-- Main Options -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <button class="neubrutalism p-4 rounded-lg button-hover bg-[#E7FFE7] flex items-center gap-2">
+                <i class="bi bi-image text-2xl text-green-600"></i>
+                Create Image
+            </button>
+            <button class="neubrutalism p-4 rounded-lg button-hover bg-[#FFE7D6] flex items-center gap-2">
+                <i class="bi bi-file-text text-2xl text-orange-600"></i>
+                Summarize Text
+            </button>
+        </div>
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <button class="neubrutalism p-4 rounded-lg button-hover bg-[#E7E7FF] flex items-center gap-2">
+                <i class="bi bi-code-slash text-2xl text-blue-600"></i>
+                Code
+            </button>
+            <button class="neubrutalism p-4 rounded-lg button-hover bg-[#FFFFE7] flex items-center gap-2">
+                <i class="bi bi-lightbulb text-2xl text-yellow-600"></i>
+                Brainstorm
+            </button>
+            <button class="neubrutalism p-4 rounded-lg button-hover bg-white flex items-center gap-2">
+                <i class="bi bi-grid text-2xl"></i>
+                More
+            </button>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container neubrutalism rounded-lg bg-white p-4 mb-6 overflow-y-auto">
+            <div class="flex flex-col gap-4" id="chat-messages">
+                <div class="bg-[#f0f0f0] p-4 rounded-lg neubrutalism">
+                    <p class="font-bold">Tech Titans</p>
+                    <p>Hello! I'm your AI assistant. How can I help you today?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="flex gap-4 items-center">
+            <button class="neubrutalism p-3 rounded-full button-hover bg-white">
+                <i class="bi bi-camera text-xl"></i>
+            </button>
+            <button class="neubrutalism p-3 rounded-full button-hover bg-white">
+                <i class="bi bi-image text-xl"></i>
+            </button>
+            <div class="flex-1 relative">
+                <textarea id="message-input" class="message-input rounded-full w-full py-3 px-6 resize-none" rows="1" placeholder="Message..."></textarea>
+            </div>
+            <button id="send-button" class="neubrutalism p-3 rounded-full send-button button-hover">
+                <i class="bi bi-send text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const chatMessages = document.getElementById('chat-messages');
+
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            appendMessage('user', message);
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+
+            try {
+                const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/ai', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer sPWwwOEAnrYlHeQvw0pd4vyNBaf1',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        messages: [{
+                            role: 'user',
+                            content: [{
+                                type: 'text',
+                                text: message
+                            }]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                appendMessage('assistant', data.message);
+            } catch (error) {
+                appendMessage('assistant', 'Sorry, I encountered an error. Please try again.');
+            }
+        }
+
+        function appendMessage(role, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `bg-[${role === 'user' ? '#E7FFE7' : '#f0f0f0'}] p-4 rounded-lg neubrutalism`;
+            messageDiv.innerHTML = `
+                <p class="font-bold">${role === 'user' ? 'You' : 'Tech Titans'}</p>
+                <p>${marked.parse(content)}</p>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
